@@ -3,8 +3,8 @@ import { computed, ref, useTemplateRef, watch } from 'vue';
 import { RouterLink } from 'vue-router';
 import ConfirmDialog from '../components/ConfirmDialog.vue';
 import ErrorMessage from '../components/ErrorMessage.vue';
-import Icon from '../components/Icon.vue';
-import Spinner from '../components/Spinner.vue';
+import BaseIcon from '../components/BaseIcon.vue';
+import BaseSpinner from '../components/BaseSpinner.vue';
 import { useDebouncedValue } from '../composables/useDebouncedValue';
 import { useErrorMessage } from '../composables/useErrorMessage';
 import { useDeleteState, useStates } from '../composables/useStateQueries';
@@ -93,7 +93,7 @@ const sortableColumns: { field: SortField; label: string }[] = [
         to="/state/new"
         class="bg-success hover:bg-success/90 inline-flex items-center gap-1 rounded px-3 py-1.5 text-sm text-white"
       >
-        <Icon name="plus" />
+        <BaseIcon name="plus" />
         New state
       </RouterLink>
     </div>
@@ -114,7 +114,7 @@ const sortableColumns: { field: SortField; label: string }[] = [
           />
         </div>
 
-        <Spinner v-if="isLoading" />
+        <BaseSpinner v-if="isLoading" />
 
         <div v-else-if="states.length === 0" class="py-3 text-center text-gray-500">
           <p>No states registered.</p>
@@ -141,7 +141,7 @@ const sortableColumns: { field: SortField; label: string }[] = [
                   @click="handleSort(column.field)"
                 >
                   {{ column.label }}
-                  <Icon
+                  <BaseIcon
                     v-if="sortField === column.field"
                     :name="sortDirection === 'asc' ? 'chevron-up' : 'chevron-down'"
                     :size="12"
@@ -169,7 +169,7 @@ const sortableColumns: { field: SortField; label: string }[] = [
                   :aria-label="`Edit ${state.abbreviation}`"
                   class="bg-brand hover:bg-brand-dark inline-flex items-center gap-1 rounded px-2 py-1 text-white"
                 >
-                  <Icon name="pencil" :size="14" />
+                  <BaseIcon name="pencil" :size="14" />
                   <span class="hidden md:inline">Edit</span>
                 </RouterLink>
                 <button
@@ -179,7 +179,7 @@ const sortableColumns: { field: SortField; label: string }[] = [
                   class="bg-danger inline-flex cursor-pointer items-center gap-1 rounded px-2 py-1 text-white hover:opacity-90 disabled:cursor-default disabled:opacity-50"
                   @click="askToDelete(state.id, state.abbreviation)"
                 >
-                  <Icon name="trash" :size="14" />
+                  <BaseIcon name="trash" :size="14" />
                   <span class="hidden md:inline">Delete</span>
                 </button>
               </td>

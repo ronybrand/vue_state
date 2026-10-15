@@ -2,7 +2,7 @@
 import { watch } from 'vue';
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router';
 import AppFooter from './components/AppFooter.vue';
-import Icon from './components/Icon.vue';
+import BaseIcon from './components/BaseIcon.vue';
 import { useTokenValid } from './composables/useTokenValid';
 import { authService } from './services/authService';
 
@@ -38,7 +38,7 @@ watch(loggedIn, (valid) => {
         class="cursor-pointer text-white"
         @click="logout"
       >
-        <Icon name="box-arrow-right" />
+        <BaseIcon name="box-arrow-right" />
       </button>
     </nav>
     <div class="flex-1"><RouterView /></div>

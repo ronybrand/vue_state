@@ -2,7 +2,7 @@
 import { computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import FormPage from '../components/FormPage.vue';
-import Spinner from '../components/Spinner.vue';
+import BaseSpinner from '../components/BaseSpinner.vue';
 import StateForm from '../components/StateForm.vue';
 import { useErrorMessage } from '../composables/useErrorMessage';
 import { useStateById, useStates, useUpdateState } from '../composables/useStateQueries';
@@ -51,7 +51,7 @@ function submit(data: NewState) {
 
 <template>
   <FormPage title="Edit state" :error="error" :request-id="requestId">
-    <Spinner v-if="validId && isLoading" />
+    <BaseSpinner v-if="validId && isLoading" />
     <StateForm
       v-if="state"
       :initial-values="{ abbreviation: state.abbreviation, name: state.name }"

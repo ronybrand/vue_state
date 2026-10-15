@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/vue';
-import Spinner from './Spinner.vue';
+import BaseSpinner from './BaseSpinner.vue';
 
 it('exposes a status role with an accessible label', () => {
-  render(Spinner);
+  render(BaseSpinner);
   expect(screen.getByRole('status')).toHaveTextContent('Loading...');
 });

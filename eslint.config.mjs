@@ -7,6 +7,9 @@ export default defineConfig([
   globalIgnores(['dist/**', 'coverage/**', 'node_modules/**']),
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  // TypeScript already reports undefined identifiers; no-undef only adds false positives (DOM types).
+  { files: ['**/*.ts', '**/*.vue'], rules: { 'no-undef': 'off' } },
+  { files: ['scripts/**'], languageOptions: { globals: { process: 'readonly' } } },
   ...pluginVue.configs['flat/recommended'],
   {
     files: ['**/*.vue'],
