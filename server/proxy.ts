@@ -1,5 +1,5 @@
 import { isIP } from 'node:net';
-import { UUID_REGEX } from '../src/lib/uuid';
+import { UUID_REGEX } from '../src/lib/uuid.js';
 
 // Full catch-all BFF proxy to the Java backend: every /api/* call the browser
 // makes is same-origin against this deployment, which forwards it to

@@ -4,7 +4,7 @@ import vue from '@vitejs/plugin-vue';
 import tailwindcss from '@tailwindcss/vite';
 
 // In dev, /api is forwarded to the backend by Vite itself. In production the
-// same contract is served by api/[...path].ts (a Vercel Function), so the
+// same contract is served by api/proxy.ts (a Vercel Function), so the
 // browser only ever talks to its own origin in both cases - no CORS needed.
 const backendUrl = process.env.BACKEND_API_URL ?? 'http://localhost:8080';
 

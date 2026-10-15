@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { BACKEND_TIMEOUT_MS, MAX_BODY_BYTES, proxy } from './proxy';
+import { BACKEND_TIMEOUT_MS, MAX_BODY_BYTES, proxy } from './proxy.js';
 
 const UUID = '123e4567-e89b-12d3-a456-426614174000';
 

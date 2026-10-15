@@ -24,7 +24,7 @@ CRUD for Brazilian federative units (states) built with **Vue 3**. It is a port 
 | `ProtectedRoute` + `(protected)` group | `meta.requiresAuth` + `router.beforeEach`              |
 | react-hook-form + zodResolver          | `StateForm.vue` with `zod.safeParse` on reactive data  |
 | `ConfirmDialog` forwardRef             | `ConfirmDialog.vue` with `defineExpose({ open })`      |
-| `app/api/[...path]/route.ts` (BFF)     | `server/proxy.ts` via `api/[...path].ts` + Vite proxy  |
+| `app/api/proxy/route.ts` (BFF)         | `server/proxy.ts` via `api/proxy.ts` + Vite proxy      |
 | `proxy.ts` per-request CSP nonce       | static CSP in `vercel.json` (no inline scripts in SPA) |
 
 ## Running

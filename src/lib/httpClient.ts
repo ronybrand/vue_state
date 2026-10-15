@@ -13,7 +13,7 @@ interface RetryConfig extends AxiosRequestConfig {
 }
 
 // Always same-origin '/api', never a direct backend URL: in dev Vite's proxy
-// answers it, in production api/[...path].ts does (a Vercel Function). The
+// answers it, in production api/proxy.ts does (a Vercel Function). The
 // browser only ever talks to its own origin, so neither CORS on the backend
 // nor a CSP connect-src naming it is needed.
 const baseURL = '/api';
