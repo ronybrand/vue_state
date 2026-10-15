@@ -19,6 +19,14 @@ updates:
       weekly-batch:
         patterns:
           - '*'
+    ignore:
+      # typescript-eslint doesn't support TS majors as soon as they ship: its
+      # peer range is `>=4.8.4 <6.1.0`, so 6.0.x is fine (the project is on it)
+      # and only 6.1.0+ breaks `npm ci`/lint. Kept as a version bound rather
+      # than a blanket major ignore, which would also have blocked 6.0.x.
+      # Dependabot's npm job failed on exactly this peer conflict.
+      - dependency-name: 'typescript'
+        versions: ['>=6.1.0']
 
   - package-ecosystem: github-actions
     directory: /

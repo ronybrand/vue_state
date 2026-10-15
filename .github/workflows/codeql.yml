@@ -11,6 +11,9 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     permissions:
+      # contents: read is needed too: listing permissions drops the defaults,
+      # and checkout of a private repository fails without it.
+      contents: read
       security-events: write
     steps:
       - uses: actions/checkout@v4
