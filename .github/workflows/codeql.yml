@@ -11,8 +11,9 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     permissions:
-      # contents: read is needed too: listing permissions drops the defaults,
-      # and checkout of a private repository fails without it.
+      # Listing permissions drops the defaults, so a private repository also
+      # needs contents: read (checkout) and actions: read (CodeQL's run lookup).
+      actions: read
       contents: read
       security-events: write
     steps:
