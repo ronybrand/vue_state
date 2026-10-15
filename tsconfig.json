@@ -14,5 +14,13 @@
     "types": ["vite/client", "vitest/globals", "node", "@testing-library/jest-dom"],
     "paths": { "@/*": ["./src/*"] }
   },
-  "include": ["src/**/*.ts", "src/**/*.vue", "api/**/*.ts", "server/**/*.ts", "vite.config.ts"]
+  "include": [
+    "e2e/**/*.ts",
+    "playwright.config.ts",
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "api/**/*.ts",
+    "server/**/*.ts",
+    "vite.config.ts"
+  ]
 }

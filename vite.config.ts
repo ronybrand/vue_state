@@ -28,12 +28,14 @@ export default defineConfig({
       reporter: ['text', 'lcov'],
       exclude: [
         'node_modules/',
+        'e2e/',
+        'playwright.config.ts',
         'src/setupTests.ts',
         'src/testUtils.ts',
         'vite.config.ts',
         'eslint.config.mjs',
       ],
     },
-    exclude: ['node_modules/**', 'dist/**'],
+    exclude: ['node_modules/**', 'dist/**', 'e2e/**'],
   },
 });
