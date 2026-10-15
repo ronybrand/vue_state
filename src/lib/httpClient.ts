@@ -1,0 +1,95 @@
+import axios, { type AxiosRequestConfig } from 'axios';
+import { clearToken, getToken } from './tokenStorage';
+import { LOGIN_PATH } from './apiPaths';
+import { notifySessionExpired } from './sessionExpired';
+
+export const REQUEST_ID_HEADER = 'X-Request-Id';
+export const TIMEOUT_MS = 15000;
+export const RETRY_COUNT = 2;
+export const RETRY_DELAY_MS = 500;
+
+interface RetryConfig extends AxiosRequestConfig {
+  _retryCount?: number;
+}
+
+// Always same-origin '/api', never a direct backend URL: in dev Vite's proxy
+// answers it, in production api/[...path].ts does (a Vercel Function). The
+// browser only ever talks to its own origin, so neither CORS on the backend
+// nor a CSP connect-src naming it is needed.
+const baseURL = '/api';
+
+export const httpClient = axios.create({
+  baseURL,
+  timeout: TIMEOUT_MS,
+});
+
+// A relative url is always resolved against baseURL by axios, so it's safe.
+// A request can also be made with an absolute url on this same instance
+// though (bypassing baseURL entirely), so that case is checked against a
+// boundary - not just startsWith - so a neighboring origin like
+// `${baseURL}evil.com` isn't treated as the API itself.
+function isApiRequest(url: string | undefined): boolean {
+  if (!url || !/^https?:\/\//i.test(url)) {
+    return true;
+  }
+
+  const base = new URL(baseURL, window.location.origin).toString().replace(/\/$/, '');
+  return url === base || url.startsWith(`${base}/`);
+}
+
+// Generated once per logical user action, not per network attempt - the
+// retry interceptor resends the same config through the client, which goes
+// through this interceptor again; only generate a new id when there isn't
+// one yet, so that up to RETRY_COUNT attempts of the same GET correlate as
+// a single action in the backend logs, not disconnected events.
+httpClient.interceptors.request.use((config) => {
+  if (!config.headers.has(REQUEST_ID_HEADER)) {
+    config.headers.set(REQUEST_ID_HEADER, crypto.randomUUID());
+  }
+
+  const token = getToken();
+  if (token && !config.headers.has('Authorization') && isApiRequest(config.url)) {
+    config.headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  return config;
+});
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+httpClient.interceptors.response.use(undefined, async (error) => {
+  const config: RetryConfig | undefined = error.config;
+  const status: number | undefined = error.response?.status;
+
+  // Checked before the retry branch below so a 401 is never retried, and
+  // handled here (not left to page-level onError) because it's a global
+  // concern - any request can lose auth mid-session, not just the one the
+  // user happens to be looking at. The login request itself is excluded:
+  // a wrong-password attempt also answers 401, and that's a normal form
+  // error for the Login view to show, not a session loss to react to globally.
+  // Guards against concurrent in-flight requests each triggering their own
+  // clearToken()/navigate when a session expires: only the first 401 to see
+  // a token still present does the redirect, the rest are no-ops here.
+  // Navigation itself is delegated to a subscriber (see sessionExpired.ts).
+  if (status === 401 && !config?.url?.endsWith(LOGIN_PATH) && getToken()) {
+    clearToken();
+    notifySessionExpired();
+    throw error;
+  }
+
+  const retryable = !status || status >= 500;
+
+  if (!config || config.method?.toLowerCase() !== 'get' || !retryable) {
+    throw error;
+  }
+
+  config._retryCount = (config._retryCount ?? 0) + 1;
+  if (config._retryCount > RETRY_COUNT) {
+    throw error;
+  }
+
+  await delay(RETRY_DELAY_MS * 2 ** (config._retryCount - 1));
+  return httpClient(config);
+});
