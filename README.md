@@ -12,7 +12,7 @@ CRUD for Brazilian federative units (states) built with **Vue 3**. It is a port 
 - Axios (request id, timeout and GET retry interceptors)
 - Zod (validation and domain types)
 - Tailwind CSS v4
-- Vitest + Testing Library for Vue (159 tests), ESLint (`eslint-plugin-vue`), Prettier
+- Vitest + Testing Library for Vue (159 tests), Playwright + axe-core, ESLint (`eslint-plugin-vue`), Prettier
 
 ## React to Vue mapping
 
@@ -32,8 +32,9 @@ CRUD for Brazilian federative units (states) built with **Vue 3**. It is a port 
 ```bash
 npm install
 BACKEND_API_URL=http://localhost:8080 npm run dev   # Vite proxies /api to the backend
-npm run test
+npm run test        # unit/component tests (Vitest)
 npm run build
+npm run e2e         # Playwright + axe-core against the production build (mocked API)
 ```
 
 `BACKEND_API_URL` (and optionally `BACKEND_PROXY_SECRET`, used to forward the real client IP) are
@@ -52,6 +53,8 @@ bypass the proxy.
 - The JWT lives in `localStorage` (accepted XSS exposure for a stateless SPA and a single admin
   scope); `isTokenValid` is a routing hint only, the backend authorizes every request.
 
-## Not ported
+## Tooling
 
-Playwright e2e/accessibility suites, Husky/lint-staged and the Dependabot automation of the React repo.
+Playwright e2e and axe-core accessibility specs (Chromium + Firefox, 26 each), Husky + lint-staged
+(eslint and prettier on staged files), and Dependabot with auto-merge of non-major updates.
+The Next-specific Dependabot ignore rules (tied to `eslint-config-next`) were not carried over.

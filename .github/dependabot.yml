@@ -1,0 +1,30 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      # More specific than weekly-batch below (dependabot prefers the more
+      # specific group), so vitest and @vitest/coverage-v8 always bump
+      # together - they are peer-dependency-locked to the same major, and a
+      # standalone bump of one of them breaks `npm ci` with an ERESOLVE conflict.
+      vitest:
+        patterns:
+          - 'vitest'
+          - '@vitest/*'
+      # @playwright/test must match the Playwright container image tag used by
+      # the e2e job in ci.yml; bump them together and update the tag by hand.
+      weekly-batch:
+        patterns:
+          - '*'
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      weekly-batch:
+        patterns:
+          - '*'
