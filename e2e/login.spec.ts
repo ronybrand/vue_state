@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { mockStateList, pageOf } from './fixtures/states';
+import { fakeJwt } from './fixtures/auth';
 
 // The guard redirects client-side via vue-router; under the CPU contention of
 // the full suite's parallel workers the URL commit can occasionally exceed the
@@ -35,12 +36,13 @@ test.describe('Login', () => {
   });
 
   test('valid login stores the token and navigates to the list', async ({ page }) => {
+    const token = fakeJwt();
     await mockStateList(page, []);
     await page.route('**/api/auth/login', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ token: 'test-token', expiresInSeconds: 3600 }),
+        body: JSON.stringify({ token, expiresInSeconds: 3600 }),
       }),
     );
 
@@ -50,8 +52,10 @@ test.describe('Login', () => {
     await page.getByRole('button', { name: 'Log in' }).click();
 
     await expect(page).toHaveURL('/');
-    const token = await page.evaluate(() => localStorage.getItem('estado_jwt'));
-    expect(token).toBe('test-token');
+    const stored = await page.evaluate(() => localStorage.getItem('estado_jwt'));
+    expect(stored).toBe(token);
+    // Regression: the logout button used to appear only after the 5s poll.
+    await expect(page.getByRole('button', { name: 'Sair' })).toBeVisible();
   });
 
   test('invalid login shows an error message and does not navigate', async ({ page }) => {

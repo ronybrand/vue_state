@@ -1,5 +1,13 @@
 const TOKEN_KEY = 'estado_jwt';
 
+// The browser's own `storage` event only fires in *other* tabs, so a login or
+// logout in this tab announces itself with this one (see useTokenValid).
+export const TOKEN_CHANGED_EVENT = 'estado:token-changed';
+
+function notifyTokenChanged(): void {
+  window.dispatchEvent(new Event(TOKEN_CHANGED_EVENT));
+}
+
 // localStorage over an httpOnly cookie: accepted XSS exposure in exchange for
 // a stateless SPA client and no CSRF surface, consistent with the short
 // expiration and single-admin scope of the backend's ADR 0017 (see
@@ -13,10 +21,12 @@ export function getToken(): string | null {
 
 export function setToken(token: string): void {
   localStorage.setItem(TOKEN_KEY, token);
+  notifyTokenChanged();
 }
 
 export function clearToken(): void {
   localStorage.removeItem(TOKEN_KEY);
+  notifyTokenChanged();
 }
 
 // Decodes the JWT's exp claim client-side, no round trip to the backend -

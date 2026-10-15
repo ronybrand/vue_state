@@ -9,10 +9,14 @@ const TOKEN_KEY = 'estado_jwt';
 // isTokenValid only decodes the exp claim client-side - it never verifies
 // the signature (the backend, not this route, is what actually enforces
 // auth on real requests).
-export async function authenticated(page: Page): Promise<void> {
-  const exp = Math.floor(Date.now() / 1000) + 3600;
+export function fakeJwt(expiresInSeconds = 3600): string {
+  const exp = Math.floor(Date.now() / 1000) + expiresInSeconds;
   const payload = Buffer.from(JSON.stringify({ exp })).toString('base64url');
-  const token = `header.${payload}.signature`;
+  return `header.${payload}.signature`;
+}
+
+export async function authenticated(page: Page): Promise<void> {
+  const token = fakeJwt();
 
   await page.addInitScript(
     ([key, value]) => {

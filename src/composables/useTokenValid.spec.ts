@@ -56,4 +56,15 @@ describe('useTokenValid', () => {
     window.dispatchEvent(new Event('storage'));
     expect(valid.value).toBe(false);
   });
+
+  it('reacts at once to a login/logout in the same tab, without waiting for the poll', () => {
+    const scope = effectScope();
+    const valid = scope.run(() => useTokenValid())!;
+    expect(valid.value).toBe(false);
+    setToken(jwt(60));
+    expect(valid.value).toBe(true);
+    clearToken();
+    expect(valid.value).toBe(false);
+    scope.stop();
+  });
 });
