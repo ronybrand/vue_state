@@ -4,7 +4,7 @@ import '@testing-library/jest-dom/vitest';
 // polyfill only kicks in when the API is missing, so it's a no-op in a real
 // browser - lets components use the native <dialog> element without a modal
 // library just to sidestep a test-environment limitation.
-if (!HTMLDialogElement.prototype.showModal) {
+if (typeof HTMLDialogElement !== 'undefined' && !HTMLDialogElement.prototype.showModal) {
   HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement): void {
     this.setAttribute('open', '');
   };

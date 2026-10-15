@@ -30,18 +30,14 @@ describe('api proxy', () => {
   });
 
   describe('routing', () => {
-    it.each([
-      'estado',
-      'estado/',
-      'estado/paginado',
-      'estado/12',
-      'auth/login',
-      'actuator/info',
-    ])('forwards %s', async (path) => {
-      const response = await call(path);
-      expect(response.status).toBe(200);
-      expect(fetchMock).toHaveBeenCalledOnce();
-    });
+    it.each(['estado', 'estado/', 'estado/paginado', 'estado/12', 'auth/login', 'actuator/info'])(
+      'forwards %s',
+      async (path) => {
+        const response = await call(path);
+        expect(response.status).toBe(200);
+        expect(fetchMock).toHaveBeenCalledOnce();
+      },
+    );
 
     it.each([
       'actuator/heapdump',
@@ -111,8 +107,8 @@ describe('api proxy', () => {
       expect(fetchMock.mock.calls[0][1].headers['X-Request-Id']).toBe(UUID);
     });
 
-    it('drops an X-Request-Id that is not a UUID (log injection)', async () => {
-      await call('estado', { headers: { 'X-Request-Id': 'abc\nINJECT' } });
+    it('drops an X-Request-Id that is not a UUID (log injection, markup)', async () => {
+      await call('estado', { headers: { 'X-Request-Id': 'not-a-uuid<script>' } });
       expect(fetchMock.mock.calls[0][1].headers['X-Request-Id']).toBeUndefined();
     });
 
@@ -204,10 +200,14 @@ describe('api proxy', () => {
     });
 
     it('echoes a UUID request id and drops anything else', async () => {
-      fetchMock.mockResolvedValueOnce(json({}, { headers: { 'Content-Type': 'application/json', 'X-Request-Id': UUID } }));
+      fetchMock.mockResolvedValueOnce(
+        json({}, { headers: { 'Content-Type': 'application/json', 'X-Request-Id': UUID } }),
+      );
       expect((await call('estado')).headers.get('X-Request-Id')).toBe(UUID);
 
-      fetchMock.mockResolvedValueOnce(json({}, { headers: { 'Content-Type': 'application/json', 'X-Request-Id': 'nope' } }));
+      fetchMock.mockResolvedValueOnce(
+        json({}, { headers: { 'Content-Type': 'application/json', 'X-Request-Id': 'nope' } }),
+      );
       expect((await call('estado')).headers.get('X-Request-Id')).toBeNull();
     });
 
@@ -222,7 +222,9 @@ describe('api proxy', () => {
 
     it('accepts vendor +json content types', async () => {
       fetchMock.mockResolvedValue(
-        new Response('{}', { headers: { 'Content-Type': 'application/problem+json; charset=utf-8' } }),
+        new Response('{}', {
+          headers: { 'Content-Type': 'application/problem+json; charset=utf-8' },
+        }),
       );
       expect((await call('estado')).status).toBe(200);
     });
