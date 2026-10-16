@@ -26,6 +26,9 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],
+      // Fails `npm run test:coverage` (and so the CI test job) when a total drops below the
+      // floor. Measured at 97/95/95/97, so a few points of headroom, not a target to coast on.
+      thresholds: { statements: 90, branches: 85, functions: 90, lines: 90 },
       exclude: [
         'node_modules/',
         'e2e/',
