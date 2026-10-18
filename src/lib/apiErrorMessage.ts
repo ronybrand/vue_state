@@ -1,7 +1,23 @@
 import { isAxiosError } from 'axios';
 
+// Page served by the start-api Lambda (backend repo, ADR 0026): anti-bot
+// challenge, starts the EC2 and waits for the API to come back.
+export const START_API_URL =
+  'https://pizowbnhivr3vholalz5r7ajta0mkvqn.lambda-url.us-east-1.on.aws/';
+
+// ?back: the page returns to the exact URL the user came from, but only if its
+// origin is on the page's own allow-list (no open redirect). ?lang=en: this app
+// is English-only.
+export function startApiUrl(currentUrl?: string): string {
+  const params = new URLSearchParams({ lang: 'en' });
+  if (currentUrl) {
+    params.set('back', currentUrl);
+  }
+  return `${START_API_URL}?${params.toString()}`;
+}
+
 export const API_UNAVAILABLE_MESSAGE =
-  'The API is temporarily offline (paused to save cost). Please try again in a few minutes.';
+  'The API is offline (paused to save cost). Turn it on with the link below; it takes about 1 minute.';
 
 const GATEWAY_STATUSES = new Set([502, 503, 504]);
 

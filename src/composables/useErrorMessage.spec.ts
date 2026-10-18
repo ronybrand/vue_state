@@ -1,3 +1,4 @@
+import { API_UNAVAILABLE_MESSAGE } from '../lib/apiErrorMessage';
 import { useErrorMessage } from './useErrorMessage';
 
 describe('useErrorMessage', () => {
@@ -22,6 +23,15 @@ describe('useErrorMessage', () => {
     setError('Boom');
     vi.advanceTimersByTime(4999);
     expect(error.value).toBe('Boom');
+    vi.advanceTimersByTime(1);
+    expect(error.value).toBeNull();
+  });
+
+  it('keeps the API-unavailable message well past the default 5s', () => {
+    const { error, setError } = useErrorMessage();
+    setError(API_UNAVAILABLE_MESSAGE);
+    vi.advanceTimersByTime(59999);
+    expect(error.value).toBe(API_UNAVAILABLE_MESSAGE);
     vi.advanceTimersByTime(1);
     expect(error.value).toBeNull();
   });
