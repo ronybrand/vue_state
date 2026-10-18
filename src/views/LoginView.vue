@@ -5,6 +5,7 @@ import FormPage from '../components/FormPage.vue';
 import { useErrorMessage } from '../composables/useErrorMessage';
 import { useLogin } from '../composables/useLogin';
 import { extractRequestId } from '../lib/extractRequestId';
+import { apiErrorMessage } from '../lib/apiErrorMessage';
 import type { LoginCredentials } from '../services/authService';
 
 const router = useRouter();
@@ -31,7 +32,7 @@ function submit() {
       onSuccess: () => router.push('/'),
       onError: (err) => {
         submitInFlight = false;
-        setError('Invalid username or password.', extractRequestId(err));
+        setError(apiErrorMessage(err, 'Invalid username or password.'), extractRequestId(err));
       },
     },
   );

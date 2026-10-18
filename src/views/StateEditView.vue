@@ -7,6 +7,7 @@ import StateForm from '../components/StateForm.vue';
 import { useErrorMessage } from '../composables/useErrorMessage';
 import { useStateById, useStates, useUpdateState } from '../composables/useStateQueries';
 import { extractRequestId } from '../lib/extractRequestId';
+import { apiErrorMessage } from '../lib/apiErrorMessage';
 import type { NewState } from '../interfaces/state';
 
 const route = useRoute();
@@ -27,7 +28,10 @@ watch(
     if (!validId.value) {
       setError('Invalid state.');
     } else if (isError.value) {
-      setError('Failed to fetch state.', extractRequestId(loadError.value));
+      setError(
+        apiErrorMessage(loadError.value, 'Failed to fetch state.'),
+        extractRequestId(loadError.value),
+      );
     } else {
       clearError();
     }
@@ -43,7 +47,8 @@ function submit(data: NewState) {
     { ...state.value, ...data },
     {
       onSuccess: () => router.push('/'),
-      onError: (err) => setError('Failed to update state.', extractRequestId(err)),
+      onError: (err) =>
+        setError(apiErrorMessage(err, 'Failed to update state.'), extractRequestId(err)),
     },
   );
 }
