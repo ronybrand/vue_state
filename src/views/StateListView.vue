@@ -9,6 +9,7 @@ import { useDebouncedValue } from '../composables/useDebouncedValue';
 import { useErrorMessage } from '../composables/useErrorMessage';
 import { useDeleteState, useStates } from '../composables/useStateQueries';
 import { extractRequestId } from '../lib/extractRequestId';
+import { apiErrorMessage } from '../lib/apiErrorMessage';
 import { formatDate } from '../lib/formatDate';
 
 type SortField = 'nome' | 'sigla';
@@ -36,7 +37,10 @@ const { error, requestId, setError } = useErrorMessage();
 
 watch(isError, (failed) => {
   if (failed) {
-    setError('Failed to fetch states.', extractRequestId(loadError.value));
+    setError(
+      apiErrorMessage(loadError.value, 'Failed to fetch states.'),
+      extractRequestId(loadError.value),
+    );
   }
 });
 
@@ -74,7 +78,8 @@ function confirmDeletion() {
     return;
   }
   deleteState.mutate(pendingDelete.value.id, {
-    onError: (err) => setError('Failed to delete state.', extractRequestId(err)),
+    onError: (err) =>
+      setError(apiErrorMessage(err, 'Failed to delete state.'), extractRequestId(err)),
   });
 }
 

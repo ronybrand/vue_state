@@ -6,6 +6,7 @@ import StateForm from '../components/StateForm.vue';
 import { useErrorMessage } from '../composables/useErrorMessage';
 import { useCreateState, useStates } from '../composables/useStateQueries';
 import { extractRequestId } from '../lib/extractRequestId';
+import { apiErrorMessage } from '../lib/apiErrorMessage';
 import type { NewState } from '../interfaces/state';
 
 const router = useRouter();
@@ -17,7 +18,8 @@ const { error, requestId, setError } = useErrorMessage();
 function submit(state: NewState) {
   createState.mutate(state, {
     onSuccess: () => router.push('/'),
-    onError: (err) => setError('Failed to create state.', extractRequestId(err)),
+    onError: (err) =>
+      setError(apiErrorMessage(err, 'Failed to create state.'), extractRequestId(err)),
   });
 }
 </script>
