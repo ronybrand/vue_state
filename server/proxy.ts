@@ -13,11 +13,10 @@ const REQUEST_ID_HEADER = 'X-Request-Id';
 const CLIENT_IP_HEADER = 'X-Client-IP';
 const PROXY_SECRET_HEADER = 'X-Proxy-Secret';
 
-// Shorter than httpClient's 15s timeout on purpose: the proxy has to give up
-// first so the client gets a clean 504 it can retry (GET), instead of its own
-// timeout firing while this function is still hanging - and billing - on a
-// stalled backend.
+// Keeps the normal CRUD requests below httpClient's 15s timeout. The AI agent
+// has its own longer timeout because a tool-calling answer can take longer.
 export const BACKEND_TIMEOUT_MS = 10_000;
+export const AI_AGENT_TIMEOUT_MS = 55_000;
 
 // The app's real payloads (a state, a login) are tens of bytes. Capping the
 // body well below the platform limit stops a large upload from being
@@ -29,7 +28,7 @@ export const MAX_BODY_BYTES = 16 * 1024;
 // swagger, heapdump, etc. - is unreachable through it even if the backend
 // would answer. The regex also rejects any '.'/'..' segment, so a `..%2f`
 // can't climb out of BACKEND_API_URL's own path prefix.
-const ALLOWED_PATH = /^(estado\/?|estado\/paginado|estado\/\d+|auth\/login|actuator\/info)$/;
+const ALLOWED_PATH = /^(estado\/?|estado\/paginado|estado\/\d+|auth\/login|actuator\/info|ask)$/;
 
 // The backend speaks JSON only. Passing through any other Content-Type would
 // let it (or anything reflected by it) serve HTML/script from this app's own
@@ -91,6 +90,7 @@ export async function proxy(request: Request): Promise<Response> {
     return jsonResponse('Not found', 404);
   }
   const backendUrl = `${backendBaseUrl}/${path}${url.search}`;
+  const timeoutMs = path === 'ask' ? AI_AGENT_TIMEOUT_MS : BACKEND_TIMEOUT_MS;
 
   const headers: Record<string, string> = {};
   const authorization = request.headers.get('authorization');
@@ -136,7 +136,7 @@ export async function proxy(request: Request): Promise<Response> {
       method: request.method,
       headers,
       body: requestBody,
-      signal: AbortSignal.timeout(BACKEND_TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
     });
     const body = await backendResponse.text();
 

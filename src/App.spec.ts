@@ -28,6 +28,11 @@ describe('App', () => {
     );
   });
 
+  it('links to the AI assistant', async () => {
+    await renderWithProviders(App);
+    expect(screen.getByRole('link', { name: 'Ask AI' })).toHaveAttribute('href', '/ask');
+  });
+
   it('hides the logout button when logged out', async () => {
     await renderWithProviders(App);
     expect(screen.queryByRole('button', { name: 'Sair' })).toBeNull();

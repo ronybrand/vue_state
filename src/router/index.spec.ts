@@ -18,6 +18,12 @@ describe('router auth guard', () => {
     expect(router.currentRoute.value.name).toBe('login');
   });
 
+  it('lets anyone open the public AI assistant', async () => {
+    const router = createAppRouter(createMemoryHistory());
+    await router.push('/ask');
+    expect(router.currentRoute.value.name).toBe('ask');
+  });
+
   it.each(['/state/new', '/state/3/edit'])('redirects %s to /login without a token', async (p) => {
     const router = createAppRouter(createMemoryHistory());
     await router.push(p);

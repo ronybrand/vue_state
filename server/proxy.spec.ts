@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { BACKEND_TIMEOUT_MS, MAX_BODY_BYTES, proxy } from './proxy.js';
+import { AI_AGENT_TIMEOUT_MS, BACKEND_TIMEOUT_MS, MAX_BODY_BYTES, proxy } from './proxy.js';
 
 const UUID = '123e4567-e89b-12d3-a456-426614174000';
 
@@ -30,14 +30,19 @@ describe('api proxy', () => {
   });
 
   describe('routing', () => {
-    it.each(['estado', 'estado/', 'estado/paginado', 'estado/12', 'auth/login', 'actuator/info'])(
-      'forwards %s',
-      async (path) => {
-        const response = await call(path);
-        expect(response.status).toBe(200);
-        expect(fetchMock).toHaveBeenCalledOnce();
-      },
-    );
+    it.each([
+      'estado',
+      'estado/',
+      'estado/paginado',
+      'estado/12',
+      'auth/login',
+      'actuator/info',
+      'ask',
+    ])('forwards %s', async (path) => {
+      const response = await call(path);
+      expect(response.status).toBe(200);
+      expect(fetchMock).toHaveBeenCalledOnce();
+    });
 
     it.each([
       'actuator/heapdump',
@@ -64,6 +69,18 @@ describe('api proxy', () => {
     it('keeps the method', async () => {
       await call('estado/3', { method: 'DELETE' });
       expect(fetchMock.mock.calls[0][1].method).toBe('DELETE');
+    });
+
+    it('uses the extended timeout only for the AI agent request', async () => {
+      const timeout = vi.spyOn(AbortSignal, 'timeout');
+
+      await call('ask');
+      expect(timeout).toHaveBeenLastCalledWith(AI_AGENT_TIMEOUT_MS);
+
+      await call('estado');
+      expect(timeout).toHaveBeenLastCalledWith(BACKEND_TIMEOUT_MS);
+
+      timeout.mockRestore();
     });
   });
 
@@ -243,8 +260,9 @@ describe('api proxy', () => {
       expect(await response.json()).toEqual({ message: 'Failed to reach backend' });
     });
 
-    it('gives up before the browser client does (10s < its 15s timeout)', () => {
+    it('uses a longer timeout for the AI agent while keeping the CRUD timeout short', () => {
       expect(BACKEND_TIMEOUT_MS).toBeLessThan(15_000);
+      expect(AI_AGENT_TIMEOUT_MS).toBe(55_000);
     });
   });
 });

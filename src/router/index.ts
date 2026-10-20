@@ -15,6 +15,7 @@ export function createAppRouter(history: RouterHistory = createWebHistory()) {
     history,
     routes: [
       { path: '/', name: 'states', component: () => import('../views/StateListView.vue') },
+      { path: '/ask', name: 'ask', component: () => import('../views/AskAiView.vue') },
       { path: '/login', name: 'login', component: () => import('../views/LoginView.vue') },
       {
         path: '/state/new',
