@@ -83,14 +83,9 @@ async function ask() {
           </span>
         </form>
 
-        <div
-          v-if="answer !== null"
-          role="status"
-          aria-live="polite"
-          class="mt-4 rounded bg-gray-50 p-4 text-sm"
-        >
+        <output v-if="answer !== null" class="mt-4 rounded bg-gray-50 p-4 text-sm">
           <p class="whitespace-pre-wrap">{{ answer }}</p>
-        </div>
+        </output>
       </div>
 
       <footer class="border-t border-gray-200 px-4 py-3 text-center">

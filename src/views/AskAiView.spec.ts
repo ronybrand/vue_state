@@ -28,7 +28,8 @@ describe('AskAiView', () => {
     await waitFor(() =>
       expect(aiAgentService.ask).toHaveBeenCalledWith('Quantos estados existem?'),
     );
-    expect(await screen.findByRole('status')).toHaveTextContent('O Brasil tem **27 estados**.');
+    const answer = await screen.findByText('O Brasil tem **27 estados**.');
+    expect(answer.closest('output')).toHaveTextContent('O Brasil tem **27 estados**.');
   });
 
   it('does not send an empty question', async () => {
@@ -95,7 +96,11 @@ describe('AskAiView', () => {
     );
     await user.click(screen.getByRole('button', { name: 'Ask' }));
 
-    const answer = await screen.findByRole('status');
+    const answerText = await screen.findByText('<img src=x onerror=alert(1)>');
+    const answer = answerText.closest('output');
+    if (!answer) {
+      throw new Error('Expected the answer to be rendered inside an output element.');
+    }
     expect(answer).toHaveTextContent('<img src=x onerror=alert(1)>');
     expect(answer.querySelector('img')).toBeNull();
   });
