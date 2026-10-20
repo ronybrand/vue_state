@@ -60,7 +60,8 @@ describe('AskAiView', () => {
     await user.click(screen.getByRole('button', { name: 'Ask' }));
 
     expect(screen.getByRole('button', { name: 'Asking...' })).toBeDisabled();
-    expect(screen.getByRole('status')).toHaveTextContent('Asking the assistant...');
+    expect(screen.getByText('Asking the assistant...').closest('output')).not.toBeNull();
+    expect(document.querySelector('[role="status"]')).toBeNull();
   });
 
   it('shows a helpful error when the API is unavailable', async () => {

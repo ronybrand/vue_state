@@ -78,9 +78,9 @@ async function ask() {
             />
             {{ isAsking ? 'Asking...' : 'Ask' }}
           </button>
-          <span v-if="isAsking" role="status" aria-live="polite" class="sr-only">
+          <output v-if="isAsking" aria-live="polite" class="sr-only">
             Asking the assistant...
-          </span>
+          </output>
         </form>
 
         <output v-if="answer !== null" class="mt-4 rounded bg-gray-50 p-4 text-sm">
