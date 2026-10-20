@@ -75,7 +75,7 @@ matching the backend's own authorization rule; only create and edit require a to
 src/
 ├── main.ts, App.vue         # bootstrap (router, Vue Query, 401 subscriber) and app shell
 ├── router/                   # routes + auth guard (meta.requiresAuth)
-├── views/                    # StateListView, StateCreateView, StateEditView, LoginView, NotFoundView
+├── views/                    # StateListView, AskAiView, StateCreateView, StateEditView, LoginView, NotFoundView
 ├── components/               # StateForm, ConfirmDialog (native <dialog>), FormPage, ErrorMessage,
 │                               AppFooter, BaseIcon, BaseSpinner
 ├── composables/              # useStateQueries (Vue Query), useErrorMessage, useTokenValid,
@@ -83,7 +83,7 @@ src/
 ├── lib/                      # httpClient (axios + interceptors), tokenStorage, sessionExpired,
 │                               extractRequestId, formatDate, uuid
 ├── interfaces/               # State / NewState (zod) / FrontendVersion / BackendInfo
-└── services/                 # stateService + stateApiMapper (wire <-> domain), authService, infoService
+└── services/                 # stateService + stateApiMapper (wire <-> domain), aiAgentService, authService, infoService
 
 server/proxy.ts               # the BFF proxy (spec next to it)
 api/proxy.ts                  # Vercel Function entry point (re-export; everything in api/ deploys)
@@ -117,6 +117,10 @@ scripts/generate-version.mjs  # writes public/version.json (commit + build date)
   as a single action in the backend logs. A 401 clears the token and notifies a subscriber
   (`lib/sessionExpired.ts`) that `main.ts` wires to the router; `httpClient` cannot import the
   router itself because views import services, which import `httpClient`.
+- The public `/ask` page sends questions to the same-origin `/api/ask` BFF route. The proxy only
+  allows the backend paths the app needs, keeps the AI provider credentials server-side, and gives
+  this slower tool-calling request a 55s backend timeout (60s at the browser and Vercel function).
+  AI output is displayed as text rather than injected HTML.
 - The backend's JSON contract uses Portuguese field names (`sigla`, `nome`, ...) and the path
   segment `/estado`. Those are the real wire contract and are **not** translated;
   `services/stateApiMapper.ts` is a small anti-corruption layer mapping them to the English
