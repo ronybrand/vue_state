@@ -50,6 +50,16 @@ test.describe('Accessibility (axe-core, WCAG 2.1 A/AA)', () => {
     expect(results.violations).toEqual([]);
   });
 
+  test('AI assistant has no violations', async ({ page }) => {
+    await page.goto('/ask');
+    await expect(page.getByRole('textbox', { name: 'Ask about Brazilian states' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'View source on GitHub' })).toBeVisible();
+
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
+
+    expect(results.violations).toEqual([]);
+  });
+
   test('delete confirmation dialog has no violations', async ({ page }) => {
     await mockStateList(page, STATES);
     await page.goto('/');

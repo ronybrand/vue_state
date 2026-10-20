@@ -3,6 +3,8 @@
 // is not deployed as a function (everything under api/ is).
 import { proxy } from '../server/proxy.js';
 
+export const config = { maxDuration: 60 };
+
 export const GET = proxy;
 export const POST = proxy;
 export const PUT = proxy;

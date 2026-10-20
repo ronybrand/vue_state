@@ -30,16 +30,19 @@ watch(loggedIn, (valid) => {
       <RouterLink to="/" class="font-display text-lg font-semibold text-white">
         State CRUD - Vue/Java
       </RouterLink>
-      <button
-        v-if="loggedIn"
-        type="button"
-        aria-label="Sair"
-        title="Sair"
-        class="cursor-pointer text-white"
-        @click="logout"
-      >
-        <BaseIcon name="box-arrow-right" />
-      </button>
+      <div class="flex items-center gap-4">
+        <RouterLink to="/ask" class="text-sm text-white">Ask AI</RouterLink>
+        <button
+          v-if="loggedIn"
+          type="button"
+          aria-label="Sair"
+          title="Sair"
+          class="cursor-pointer text-white"
+          @click="logout"
+        >
+          <BaseIcon name="box-arrow-right" />
+        </button>
+      </div>
     </nav>
     <div class="flex-1"><RouterView /></div>
     <AppFooter />
